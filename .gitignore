@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.vel-data/
+playwright-report/
+test-results/
+*.log
+.env
+.env.*
+!.env.example
+server/generated/
+.playwright-cli/
+output/playwright/

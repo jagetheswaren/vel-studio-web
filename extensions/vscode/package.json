@@ -1,0 +1,23 @@
+{
+  "name": "vel-ide-bridge",
+  "displayName": "Vel IDE Bridge",
+  "description": "Open the local VEL IDE and send the active Vel or HTML file to its workspace.",
+  "version": "0.1.0",
+  "publisher": "vel-local",
+  "engines": { "vscode": "^1.90.0" },
+  "categories": ["Other"],
+  "main": "./extension.cjs",
+  "activationEvents": ["onCommand:vel.openIDE", "onCommand:vel.sendFile"],
+  "contributes": {
+    "commands": [
+      { "command": "vel.openIDE", "title": "Vel: Open Local IDE" },
+      { "command": "vel.sendFile", "title": "Vel: Send Active File to IDE" }
+    ],
+    "configuration": {
+      "title": "Vel IDE",
+      "properties": {
+        "vel.serverUrl": { "type": "string", "default": "http://127.0.0.1:4310", "description": "Loopback URL of the running local VEL IDE server." }
+      }
+    }
+  }
+}

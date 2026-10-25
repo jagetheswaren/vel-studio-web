@@ -1,0 +1,38 @@
+{
+  "name": "vel-ide",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/build-runtime.mjs && node server/index.js --dev",
+    "build": "node scripts/build-runtime.mjs && vite build",
+    "start": "node server/index.js",
+    "test": "node scripts/build-runtime.mjs --if-missing && node --test test/*.test.js",
+    "check": "npm run test && npm run build",
+    "desktop": "electron .",
+    "desktop:pack": "node scripts/package-desktop.mjs"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "express": "^5.1.0",
+    "lucide-react": "^0.468.0",
+    "monaco-editor": "^0.57.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "^45.0.0",
+    "esbuild": "^0.28.2",
+    "vite": "^7.2.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "overrides": {
+    "dompurify": "^3.4.17"
+  },
+  "productName": "Vel Studio",
+  "main": "desktop/main.cjs"
+}
