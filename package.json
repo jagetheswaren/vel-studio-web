@@ -1,6 +1,6 @@
 {
   "name": "vel-ide",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,7 +10,10 @@
     "test": "node scripts/build-runtime.mjs --if-missing && node --test test/*.test.js",
     "check": "npm run test && npm run build",
     "desktop": "electron .",
-    "desktop:pack": "node scripts/package-desktop.mjs"
+    "desktop:pack": "node scripts/package-desktop.mjs",
+    "doctor": "node scripts/doctor.mjs",
+    "format": "prettier --write src server shared runtime desktop scripts test *.json *.js .github/workflows/*.yml",
+    "format:check": "prettier --check src server shared runtime desktop scripts test *.json *.js .github/workflows/*.yml"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
@@ -25,6 +28,7 @@
     "@electron/packager": "^20.3.0",
     "electron": "^45.0.0",
     "esbuild": "^0.28.2",
+    "prettier": "^3.9.10",
     "vite": "^7.2.0"
   },
   "engines": {
