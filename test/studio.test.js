@@ -1,12 +1,119 @@
-import {test} from 'node:test';
+import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import {createStudioTemplate,parseStudio,serializeStudio,validateStudio,updateItem,addDesignNode,addEntity,removeItem,duplicateItem,evaluateAnimations,applyDesignAction,animationDuration} from '../shared/studio.js';
-import {compilePreview} from '../server/preview.js';
-test('every studio template validates and roundtrips without loss',()=>{for(const id of ['starter','game','blank']){const doc=createStudioTemplate(id);assert.deepEqual(validateStudio(doc),[]);assert.deepEqual(parseStudio(serializeStudio(doc)),doc);}});
-test('design and scene editing are pure and keep stable IDs',()=>{const doc=createStudioTemplate('blank'),design=addDesignNode(doc,'button'),scene=addEntity(design,'sphere');assert.equal(doc.design.nodes.length,0);assert.equal(scene.design.nodes.length,1);assert.equal(scene.scene.entities.length,1);const id=scene.design.nodes[0].id,changed=updateItem(scene,'design',id,{x:230,text:'Launch'});assert.notEqual(changed.design.nodes[0].x,scene.design.nodes[0].x);const duplicated=duplicateItem(changed,'design',id);assert.equal(duplicated.design.nodes.length,2);assert.notEqual(duplicated.design.nodes[1].id,id);assert.deepEqual(validateStudio(duplicated),[]);assert.throws(()=>updateItem(doc,'design','missing',{}),/not found/);});
-test('deleting an animation/action target cleans its references',()=>{const doc=createStudioTemplate(),removed=removeItem(doc,'design','status');assert.equal(removed.design.nodes.find(n=>n.id==='cta').action,undefined);const noHeadline=removeItem(doc,'design','headline');assert.ok(noHeadline.animations.every(a=>a.target!=='headline'));assert.deepEqual(validateStudio(noHeadline),[]);});
-test('animations sample design and scene on one timeline without mutating source',()=>{const doc=createStudioTemplate();doc.animations.push({id:'cube-x',target:'hero-cube',property:'x',from:0,to:10,duration:1000,delay:0,loop:false});const mid=evaluateAnimations(doc,500);assert.equal(mid.scene.entities.find(n=>n.id==='hero-cube').position[0],5);assert.equal(doc.scene.entities.find(n=>n.id==='hero-cube').position[0],0);assert.equal(evaluateAnimations(doc,1000).scene.entities.find(n=>n.id==='hero-cube').position[0],10);assert.equal(animationDuration(doc),2200);});
-test('button interactions apply to explicit design targets',()=>{const doc=createStudioTemplate(),next=applyDesignAction(doc,'cta');assert.equal(next.design.nodes.find(n=>n.id==='status').text,'Your idea is ready to build.');assert.notEqual(doc.design.nodes.find(n=>n.id==='status').text,next.design.nodes.find(n=>n.id==='status').text);next.design.nodes.find(n=>n.id==='cta').action={type:'toggle',target:'orb-front'};assert.equal(applyDesignAction(next,'cta').design.nodes.find(n=>n.id==='orb-front').visible,false);});
-test('schema rejects invalid references, numbers, IDs, transforms and color injection',()=>{const base=createStudioTemplate();for(const mutate of [d=>d.design.nodes[0].x=Infinity,d=>d.design.nodes[0].id=d.design.nodes[1].id,d=>d.scene.entities[0].scale=[1,0,1],d=>d.scene.background='red;position:fixed',d=>d.animations[0].target='missing',d=>d.design.nodes[0].action={type:'setText',target:'missing',value:'x'}]){const d=structuredClone(base);mutate(d);assert.ok(validateStudio(d).some(e=>e.severity==='error'));}assert.throws(()=>parseStudio('{'),/Invalid studio JSON/);});
-test('JSON studio compiles to an offline self-contained player and tracks',()=>{const doc=createStudioTemplate();doc.design.nodes[0].text='</script><script>alert(1)</script>';const result=compilePreview(serializeStudio(doc),'studio.vel');assert.equal(result.diagnostics.length,0);assert.equal(result.tracks.length,2);assert.match(result.html,/id="vel-document"/);assert.match(result.html,/\\u003c\/script>/);assert.doesNotMatch(result.html,/<script>alert\(1\)<\/script>/);assert.doesNotMatch(result.html,/<script[^>]+src=/);assert.ok(result.html.length>100000);});
-test('invalid studio code returns actionable preview diagnostics',()=>{const result=compilePreview('{"kind":"vel-studio"}','studio.vel');assert.equal(result.diagnostics[0].severity,'error');assert.match(result.html,/document needs attention/);});
+import {
+  createStudioTemplate,
+  parseStudio,
+  serializeStudio,
+  validateStudio,
+  updateItem,
+  addDesignNode,
+  addEntity,
+  removeItem,
+  duplicateItem,
+  evaluateAnimations,
+  applyDesignAction,
+  animationDuration,
+} from '../shared/studio.js';
+import { compilePreview } from '../server/preview.js';
+test('every studio template validates and roundtrips without loss', () => {
+  for (const id of ['starter', 'game', 'blank']) {
+    const doc = createStudioTemplate(id);
+    assert.deepEqual(validateStudio(doc), []);
+    assert.deepEqual(parseStudio(serializeStudio(doc)), doc);
+  }
+});
+test('design and scene editing are pure and keep stable IDs', () => {
+  const doc = createStudioTemplate('blank'),
+    design = addDesignNode(doc, 'button'),
+    scene = addEntity(design, 'sphere');
+  assert.equal(doc.design.nodes.length, 0);
+  assert.equal(scene.design.nodes.length, 1);
+  assert.equal(scene.scene.entities.length, 1);
+  const id = scene.design.nodes[0].id,
+    changed = updateItem(scene, 'design', id, { x: 230, text: 'Launch' });
+  assert.notEqual(changed.design.nodes[0].x, scene.design.nodes[0].x);
+  const duplicated = duplicateItem(changed, 'design', id);
+  assert.equal(duplicated.design.nodes.length, 2);
+  assert.notEqual(duplicated.design.nodes[1].id, id);
+  assert.deepEqual(validateStudio(duplicated), []);
+  assert.throws(() => updateItem(doc, 'design', 'missing', {}), /not found/);
+});
+test('deleting an animation/action target cleans its references', () => {
+  const doc = createStudioTemplate(),
+    removed = removeItem(doc, 'design', 'status');
+  assert.equal(removed.design.nodes.find((n) => n.id === 'cta').action, undefined);
+  const noHeadline = removeItem(doc, 'design', 'headline');
+  assert.ok(noHeadline.animations.every((a) => a.target !== 'headline'));
+  assert.deepEqual(validateStudio(noHeadline), []);
+});
+test('animations sample design and scene on one timeline without mutating source', () => {
+  const doc = createStudioTemplate();
+  doc.animations.push({
+    id: 'cube-x',
+    target: 'hero-cube',
+    property: 'x',
+    from: 0,
+    to: 10,
+    duration: 1000,
+    delay: 0,
+    loop: false,
+  });
+  const mid = evaluateAnimations(doc, 500);
+  assert.equal(mid.scene.entities.find((n) => n.id === 'hero-cube').position[0], 5);
+  assert.equal(doc.scene.entities.find((n) => n.id === 'hero-cube').position[0], 0);
+  assert.equal(
+    evaluateAnimations(doc, 1000).scene.entities.find((n) => n.id === 'hero-cube').position[0],
+    10,
+  );
+  assert.equal(animationDuration(doc), 2200);
+});
+test('button interactions apply to explicit design targets', () => {
+  const doc = createStudioTemplate(),
+    next = applyDesignAction(doc, 'cta');
+  assert.equal(
+    next.design.nodes.find((n) => n.id === 'status').text,
+    'Your idea is ready to build.',
+  );
+  assert.notEqual(
+    doc.design.nodes.find((n) => n.id === 'status').text,
+    next.design.nodes.find((n) => n.id === 'status').text,
+  );
+  next.design.nodes.find((n) => n.id === 'cta').action = { type: 'toggle', target: 'orb-front' };
+  assert.equal(
+    applyDesignAction(next, 'cta').design.nodes.find((n) => n.id === 'orb-front').visible,
+    false,
+  );
+});
+test('schema rejects invalid references, numbers, IDs, transforms and color injection', () => {
+  const base = createStudioTemplate();
+  for (const mutate of [
+    (d) => (d.design.nodes[0].x = Infinity),
+    (d) => (d.design.nodes[0].id = d.design.nodes[1].id),
+    (d) => (d.scene.entities[0].scale = [1, 0, 1]),
+    (d) => (d.scene.background = 'red;position:fixed'),
+    (d) => (d.animations[0].target = 'missing'),
+    (d) => (d.design.nodes[0].action = { type: 'setText', target: 'missing', value: 'x' }),
+  ]) {
+    const d = structuredClone(base);
+    mutate(d);
+    assert.ok(validateStudio(d).some((e) => e.severity === 'error'));
+  }
+  assert.throws(() => parseStudio('{'), /Invalid studio JSON/);
+});
+test('JSON studio compiles to an offline self-contained player and tracks', () => {
+  const doc = createStudioTemplate();
+  doc.design.nodes[0].text = '</script><script>alert(1)</script>';
+  const result = compilePreview(serializeStudio(doc), 'studio.vel');
+  assert.equal(result.diagnostics.length, 0);
+  assert.equal(result.tracks.length, 2);
+  assert.match(result.html, /id="vel-document"/);
+  assert.match(result.html, /\\u003c\/script>/);
+  assert.doesNotMatch(result.html, /<script>alert\(1\)<\/script>/);
+  assert.doesNotMatch(result.html, /<script[^>]+src=/);
+  assert.ok(result.html.length > 100000);
+});
+test('invalid studio code returns actionable preview diagnostics', () => {
+  const result = compilePreview('{"kind":"vel-studio"}', 'studio.vel');
+  assert.equal(result.diagnostics[0].severity, 'error');
+  assert.match(result.html, /document needs attention/);
+});

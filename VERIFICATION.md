@@ -1,5 +1,19 @@
 # Verification — 25 October 2026
 
+## v0.3 projects and launch
+
+- **29 Node tests passed**: all prior coverage plus metadata/archive, preferences validation, sessions, file revisions, concurrent saves, scoped task APIs, restart persistence and full-stack preview composition.
+- Prettier formatting check passed. Production runtime/frontend build passed. Launch doctor passed. Dependency audit reported **0 vulnerabilities**.
+- Browser-created a full-stack project through Projects home and opened its HTML source.
+- Browser-loaded its sandboxed running application, added a task, completed it and reloaded. The completed record persisted through the API.
+- Saved autosave settings through the Preferences UI, edited a file in Monaco, and confirmed the source was written to disk automatically.
+- Selected an older source revision in File History, reviewed it and restored after confirmation. The saved source returned to that revision.
+- Session restoration reopened the same project/file after browser reload.
+- The final Windows portable package passed `--smoke-test`, exit code 0: the application started its own backend and loaded Projects home successfully.
+- The additional independent UI evaluation did not finish. Primary-agent browser checks were completed; no independent v0.3 PASS verdict is claimed.
+
+The full-stack template uses a built-in Node/Express project-data backend, not arbitrary user-supplied backend execution. Public hosting, multi-user authentication, signed installers/updaters and universal extension compatibility remain outside this version.
+
 ## v0.2 unified studio
 
 - `npm test`: **21 tests passed**, including schema roundtrips, design/scene edit purity, reference cleanup, interactions, animation sampling, template API and self-contained export.

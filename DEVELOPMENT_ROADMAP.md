@@ -2,6 +2,10 @@
 
 ## Delivered foundation
 
+- v0.3: project dashboard/templates/metadata/archive, persistent preferences, autosave and recent sessions.
+- v0.3: 20-version file history, explicit restore, and a full-stack task application with persistent scoped REST data.
+- v0.3: live full-stack preview, saved-project launch URLs, launch doctor and Windows/Linux CI checks.
+
 - Local IDE, file storage, Monaco, save/import, diagnostics and a restricted workspace console.
 - Provider adapters for Ollama and OpenAI-compatible text chat, model discovery and reviewed edits.
 - Explicit HTTP tool integrations, settings and encrypted tokens.

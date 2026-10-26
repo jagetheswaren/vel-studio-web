@@ -1,21 +1,25 @@
-# Vel Studio v0.2
+# Vel Studio v0.3
 
 A local, full-stack creative studio: visual UI designer, 3D scene editor, animation authoring, Monaco code editor, persistent workspaces, AI assistant and HTTP tools. The same `.vel` Studio document connects the canvas, scene, code and exported runtime.
 
+Version 0.3 adds Projects home, project templates and metadata, a real full-stack task-board application, a working Launch flow, persistent editor/application settings, autosave, recent sessions and file revision recovery. Read the [projects and launch guide](PROJECTS_AND_LAUNCH.md) for the complete workflow and API details.
+
+Quick start: **New project → Full-stack task board → Create → edit/save → Launch → Open project**. The running application has persistent REST-backed tasks, not demonstration-only data. Its editor preview includes HTML, CSS, JavaScript and the real project API.
+
 ## Start the Windows desktop app
 
-The prepared portable application is in the neighboring `desktop-build/Vel Studio-win32-x64` folder. Run **Vel Studio.exe** from that folder. Keep the entire folder together; the executable depends on its supporting files. The desktop app starts its own loopback backend and stores writable projects in its application user-data directory.
+The prepared final portable application is in the neighboring `desktop-build/v0.3.0-final/Vel Studio-win32-x64` folder. Run **Vel Studio.exe** from that folder, or double-click **start-vel-desktop.cmd**. Keep the entire portable folder together; the executable depends on its supporting files. The desktop app starts its own loopback backend and stores writable projects in its application user-data directory. Source packaging defaults to `desktop-build/v0.3.0`; use `npm run desktop:pack -- --output PATH` for a separate build folder.
 
 The package is an unsigned development build. Source builds are available with `npm run build`, then `npm run desktop`. To package Windows again, use `npm run desktop:pack` after building; the packager preserves existing build output instead of silently overwriting it.
 
 ## Unified studio workflow
 
-Open `src/studio.vel`, which is seeded safely in the welcome workspace and every new workspace.
+Open `src/studio.vel`, which is seeded safely in the welcome workspace and every Studio-template workspace. Full-stack task-board projects instead contain editable HTML/CSS/JavaScript and API notes.
 
 1. **Design:** add shapes, text and buttons; move/resize layers; edit geometry and appearance; duplicate, reorder, hide or lock layers; undo/redo visual edits.
 2. **Scene:** add primitives, select objects, edit transforms/materials or use gizmos, orbit/zoom the camera, configure lighting/gravity and built-in behaviors.
 3. **Animate:** add tracks, edit targets/properties/values/timing, play or scrub design and scene motion.
-4. **Code:** inspect and edit the same JSON document in Monaco. Save persists it; visual changes do not silently save.
+4. **Code:** inspect and edit the same JSON document in Monaco. Manual Save or explicitly enabled autosave persists changes.
 5. **Export:** download one self-contained HTML player with interactive design buttons and a playable 3D scene. No CDN or external runtime download is needed.
 
 Use **Templates** in the top bar for a product studio, game playground or blank document. In the playground, click/focus the scene canvas while playing; use WASD/arrows to move and Space to jump.
@@ -35,6 +39,7 @@ Alternatively, from this directory:
 ```powershell
 npm ci
 npm run build
+npm run doctor
 npm start
 ```
 
@@ -171,6 +176,8 @@ Tokens are AES-256-GCM encrypted using a locally stored key. This reduces accide
 - `shared/engine.js`, `src/studio/`: the 3D engine, designer, scene inspector and animation authoring.
 - `runtime/player.js`, `server/studio.js`: the bundled offline player and export API.
 - `desktop/main.cjs`: Electron desktop lifecycle and its private local backend.
+- `server/product.js`, `server/project-template.js`, `server/revisions.js`: projects, preferences, sessions, full-stack launch/task API and revision recovery.
+- `src/product/`: project dashboard, application settings and file history UI.
 - `test/`: Node tests for renderer and API flows with mock AI/plugin servers.
 - `extensions/vscode/`: companion extension source and development instructions.
 
